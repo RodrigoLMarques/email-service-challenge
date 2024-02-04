@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  email-service-app:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3000:3000
+    container_name: "app"
+    command: npm run dev
+    env_file: .env
+    depends_on:
+      - postgres
+    networks:
+      - app-net
+
+  postgres:
+    image: postgres:alpine
+    container_name: "postgres"
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - app-net
+    
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  postgresql_data: 
+    driver: local
+    
